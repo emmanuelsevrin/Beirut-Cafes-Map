@@ -17,8 +17,8 @@
         <form class='filter' data-bind="submit: ViewModel.sortPlaces"> Filter by keyword
           <input id="filter" type="text" > </input>
         </form>
-        <ul data-bind="foreach: PlacesList">
-          <li class='places' data-bind="text: name"></li>
+        <ul data-bind="foreach: View.placesList">
+          <li class='places' data-bind="visible: visible, text: name"></li>
         </ul>
       </div>
       <div id="map"></div>
