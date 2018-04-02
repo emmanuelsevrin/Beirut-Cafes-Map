@@ -22,7 +22,7 @@ var Model = {
 		description: 'Lots of light, and delicious cafe. What else?',
 		external_link: 'http://travelingwiththyme.com/2018/02/sip-beirut-coffee-gemmayzeh/',
 		image:'sip',
-		zomato_id: '18618953',
+		zomato_id: '18595425',
 	},
 	{
 		name: 'Urbanista cafe, Gemmayze',
@@ -31,7 +31,7 @@ var Model = {
 		description: 'Good coffee, full of food options, and central in Beirut. It comes across as a bit touristy and is a bit expensive but its also a safe choice.',
 		external_link: 'http://www.weare-urbanista.com/about-us/',
 		image:'urbanista_gemmayze',
-		zomato_id: '18618953',
+		zomato_id: '16501054',
 	},
 	{
 		name: 'Urbanista cafe, Hamra',
@@ -40,7 +40,7 @@ var Model = {
 		description: 'Good coffee and full of food options.',
 		external_link: 'http://www.weare-urbanista.com/about-us/',
 		image:'urbanista_hamra',
-		zomato_id: '18618953',
+		zomato_id: '16501099',
 	},
 	{
 		name: 'De Prague Bar, Hamra',
@@ -49,7 +49,7 @@ var Model = {
 		description: 'The most stylish bar / restaurant of Beirut. Movie nights and good songs - the place to go in Beirut.',
 		external_link: 'https://www.beirut.com/l/72',
 		image:'deprague',
-		zomato_id: '18618953',
+		zomato_id: '16501916',
 	},
 	{
 		name: 'Starbucks coffee, Ashrafieh',
@@ -58,7 +58,7 @@ var Model = {
 		description: 'Another staple of Beirut for work. Only grievance - they have terrible internet.',
 		external_link: 'https://mena.starbucks.com/en',
 		image:'starbucks',
-		zomato_id: '18618953',
+		zomato_id: '16503534',
 	},
 	],
 //Location: center of Beirut
@@ -73,12 +73,17 @@ var ViewModel = {
 		//PlacesList is the list of places to display in the view
 		//fetches all the locations from the model
 		this.getallPlaces();
+		ko.applyBindings(ViewModel);
+	},
+
+
+	initMap: function(){
 
 		//creates a new map and add all the locations
 		View.newMap();
 		View.addMarkers();
 
-		//updates all infowindow with the Zomato Rating 
+		//updates all infowindow with the Zomato Rating. Loads only when the google maps is on since the Infowindow are loaded then. That could be changed if connectivity was a big problem
 		ViewModel.updateallinfowindow();
 	},
 
@@ -129,26 +134,30 @@ var ViewModel = {
 			"user-key": Zomato_user_key
 		})
 
-		let local_zomato_id = Model.keyPlaces[index].zomato_id;
+		var local_zomato_id = Model.keyPlaces[index].zomato_id;
 	
 		fetch('https://developers.zomato.com/api/v2.1/restaurant?res_id=' + local_zomato_id, {headers: myHeaders})
   		.then(function(response) {
-  			  return response.json();
- 		 })
-  		.then(function(myJson) {
+  			 	return response.json();
+  			})	 	
+  		.then(function(myJson){
+  			 	var new_rating = myJson.user_rating.aggregate_rating;
+  				//if closed, opens up the infowindow then uses jQuery to update it
+  				var infowindowwasopen = false;
 
-  		//if closed, opens up the infowindow then uses jQuery to update it
-  		var infowindowwasopen = true;
-  		  if(infowindow.getMap() == null){
-  		  	 infowindowwasopen = false;
-  		  	 infowindow.open(View.map);      		
-  		  }
-  		  $(`.rating.${local_zomato_id}`).html(myJson.user_rating.aggregate_rating);
+			  		if(infowindow.getMap()){
+	  				  	 infowindowwasopen = true;      		
+	  				}
+  				
+  				infowindow.open(View.map);
+
+  				$(`.rating.${local_zomato_id}`).html(new_rating);
   		  
-  		  if(infowindowwasopen == false){
-  		  		infowindow.close(View.map);
-  			}
- 		 });
+			  		if(!infowindowwasopen){
+	  		  				infowindow.close();
+	  				}
+ 		})
+  		.catch(e => ViewModel.handleZomatoError(e));
 
 	},
 
@@ -159,6 +168,14 @@ var ViewModel = {
 		});
 	},
 
+	ZomatoError: false,
+
+	handleZomatoError: function(e){
+		if(!ViewModel.ZomatoError){
+			alert('Error message: There was an issue with the loading of the Zomato Review. However, you should still be able to use the rest of the app ' + e);
+		};
+		ViewModel.ZomatoError = true;
+	}
 }
 
 var View = {
@@ -257,8 +274,5 @@ var View = {
 
 }
 
-
-
 ViewModel.init();
 
-ko.applyBindings(ViewModel);

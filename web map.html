@@ -24,16 +24,21 @@
       <div id="map"></div>
     </div>
 
-
-    <script 
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7-2mPi_PI5byQPXVAD-qBn9Y-SQDjs7Q&v=3">
-    </script>
-
-
     <script type='text/javascript' src='knockout-3.4.2.js'></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <script src="app.js"></script>
+    <script>
+      //separate function to call ViewModel.initMap() 
+      function loadapp(){
+        ViewModel.initMap();}
+    </script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7-2mPi_PI5byQPXVAD-qBn9Y-SQDjs7Q&v=3&callback=loadapp">
+    </script>
+
+
+
 
 
 
