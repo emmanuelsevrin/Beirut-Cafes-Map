@@ -18,7 +18,7 @@
           <input id="filter" type="text" > </input>
         </form>
         <ul data-bind="foreach: View.placesList">
-          <li class='places' data-bind="visible: visible, text: name"></li>
+          <li class='places' data-bind="visible: visible, text: name, click: go_to_highlightmarker"></li>
         </ul>
       </div>
       <div id="map"></div>

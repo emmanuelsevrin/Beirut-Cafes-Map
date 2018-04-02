@@ -16,15 +16,6 @@ var Model = {
 		zomato_id: '18618953',
 	},
 	{
-		name: 'Martyr Square, Gemmayze',
-		lat: 33.896391, 
-		lng: 35.507169,
-		description: 'Martyr Square is a place full of history in Beirut. Its name - Martyrs Square - comes in commemoration of the martyrs executed there under Ottoman rule. Moreover during the civil war it marked the demarcation line between East and West Beirut.',
-		external_link: 'https://en.wikipedia.org/wiki/Martyrs%27_Square,_Beirut',
-		image:'martyr_square',
-		zomato_id: '18618953',
-	},
-	{
 		name: 'Sip cafe, Gemmayze',
 		lat: 33.8951613,
 		lng: 35.5152216,
@@ -85,29 +76,31 @@ var ViewModel = {
 
 		//creates a new map and add all the locations
 		View.newMap();
-		View.addLocations();
+		View.addMarkers();
 
 		//updates all infowindow with the Zomato Rating 
 		ViewModel.updateallinfowindow();
 	},
 
 	//constructor for places from the Model
-	Place: function(place_data){
+	Place: function(place_data, index){
 		this.name = ko.observable(place_data.name);
 		this.lat = place_data.lat;
 		this.lng = place_data.lng;
 		this.description = place_data.description;
 		this.external_link = place_data.external_link;
 		this.image = place_data.image;
-		this.zomato_id = place_data.zomato_id
+		this.zomato_id = place_data.zomato_id;
 		this.visible = ko.observable(true);
+		this.index = index;
+		this.go_to_highlightmarker = function(){View.markersList[index].highlightmarker();};
 	},
 
 	//fetches all the locations from the model
 	getallPlaces: function(){
 		
-		Model.keyPlaces.forEach(function(place_data){
-			View.placesList.push(new ViewModel.Place(place_data));
+		Model.keyPlaces.forEach(function(place_data, index){
+			View.placesList.push(new ViewModel.Place(place_data, index));
 		});
 	},
 
@@ -122,12 +115,15 @@ var ViewModel = {
 			if(!View.placesList[k].name().includes(filterString)){
 				View.placesList[k].visible(false);
 			}
+			else{
+				View.placesList[k].visible(true);	
+			}
 		}
 	//update the markers according to the latest list of Places to display
-	View.addLocations();	
+	View.updateMap();	
 	},
 
-	//as the name indicates, update a specific infowindow with the zomato review
+	//update a target infowindow with their zomato review
 	updateInfowindowWithZomatoReview: function(infowindow, index){
 		var myHeaders = new Headers({
 			"user-key": Zomato_user_key
@@ -156,18 +152,19 @@ var ViewModel = {
 
 	},
 
+	//go through each infowindow and update it with the zomato review
 	updateallinfowindow: function(){
 		View.infoWindowList.forEach(function(infowindow, index){
 			ViewModel.updateInfowindowWithZomatoReview(infowindow, index);
 		});
-	}
+	},
 
 }
 
 var View = {
 	//those three variables represent: 1) the map that will be displayed, 2) the list of markers, 3) the list of infowindows 
 	map,
-	placesList: ko.observableArray(),
+	placesList: [],
 	markersList:[],
 	infoWindowList:[],
 
@@ -180,31 +177,24 @@ var View = {
 	},
 
 	//create new markers and add them tothe Markerlist 
-	addLocations: function(){
-		
-		//first empties the marker list to reset
-		View.markersList.forEach(function(marker){
-			marker.setMap(null);
-		});
-
-		View. markersList = [];
-
-		View.placesList().forEach(function(value){
+	addMarkers: function(){
+		View.placesList.forEach(function(value){
 			View.markersList.push(new View.mapMarker(value));
 		});
 	},
 
+
 	//update map to only keep the markers and infowindows for items open
 	updateMap: function(){
-		View.placesList().forEach(place, index){
-			if(!place.visible){
-				markersList[index].
-				infoWindowList[index].close();
+		View.placesList.forEach(function(place, index){
+			if(!place.visible()){
+				View.markersList[index].setMap(null);
+				View.infoWindowList[index].close();
 			}
 			else{
-
+				View.markersList[index].setMap(View.map);
 			}
-		}
+		})
 	},
 
 	//constructor for a new map marker
@@ -218,16 +208,18 @@ var View = {
 					title: value.name()
 				});
 
+		//creating the infowindow by pulling the infowindow text from the function below
 		var infoWindow = new google.maps.InfoWindow({
 	        content: View.Createdescription(value.name(), value.description, value.external_link, value.image, value.zomato_id),
 	        maxWidth: 400
 	    });
 
+		//adding to the list of infowindows
 	    View.infoWindowList.push(infoWindow);
 
-		marker.addListener('click', function() {
-
-	          marker.setAnimation(google.maps.Animation.BOUNCE);
+	    //function that highlight the marker and opens the infowindow. Is activated either by clicking on the marker or on the list item
+	    marker.highlightmarker =  function(){
+	    	  marker.setAnimation(google.maps.Animation.BOUNCE);
 	          setTimeout(function(){marker.setAnimation(null); }, 1400);
 
 	          //go through each infowindow and close it before opening a new one 
@@ -235,8 +227,12 @@ var View = {
 	          	infowindow_inlist.close();
 	          })
 
-	 		  infoWindow.open(View.map, marker);      	
-	        });
+	 		  infoWindow.open(View.map, marker);
+	 	}
+
+		marker.addListener('click', function() {
+			  marker.highlightmarker();
+	    });
 
 
 		return marker
