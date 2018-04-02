@@ -1,77 +1,86 @@
+//User Key to access Zomato
+var Zomato_user_key = "77335f51de6d653ec3fc9a14b78c256b";
 
-var keyPlaces = [
-{
-	name: 'Aaliya cafe, Gemmayze',
-	lat: 33.8949747,
-	lng: 35.5184084,
-	description: 'Aaliyas cafe is perhaps one of the best cafes of Beirut. Quiet, full of lights and with a friendly staff, this is hands-on the place where I like to spend most of my working time in the city.',
-	external_link: 'https://www.facebook.com/AaliyasBooks/',
-	image:'aaliya',
-	zomato_id: '18618953',
-},
-{
-	name: 'Martyr Square, Gemmayze',
-	lat: 33.896391, 
-	lng: 35.507169,
-	description: 'Martyr Square is a place full of history in Beirut. Its name - Martyrs Square - comes in commemoration of the martyrs executed there under Ottoman rule. Moreover during the civil war it marked the demarcation line between East and West Beirut.',
-	external_link: 'https://en.wikipedia.org/wiki/Martyrs%27_Square,_Beirut',
-	image:'martyr_square',
-	zomato_id: '18618953',
-},
-{
-	name: 'Sip cafe, Gemmayze',
-	lat: 33.8951613,
-	lng: 35.5152216,
-	description: 'Lots of light, and delicious cafe. What else?',
-	external_link: 'http://travelingwiththyme.com/2018/02/sip-beirut-coffee-gemmayzeh/',
-	image:'sip',
-	zomato_id: '18618953',
-},
-{
-	name: 'Urbanista cafe, Gemmayze',
-	lat: 33.895041,
-	lng: 35.513431,
-	description: 'Good coffee, full of food options, and central in Beirut. It comes across as a bit touristy and is a bit expensive but its also a safe choice.',
-	external_link: 'http://www.weare-urbanista.com/about-us/',
-	image:'urbanista_gemmayze',
-	zomato_id: '18618953',
-},
-{
-	name: 'Urbanista cafe, Hamra',
-	lat: 33.899099,
-	lng: 35.483775,
-	description: 'Good coffee and full of food options.',
-	external_link: 'http://www.weare-urbanista.com/about-us/',
-	image:'urbanista_hamra',
-	zomato_id: '18618953',
-},
-{
-	name: 'De Prague Bar, Hamra',
-	lat: 33.896143,
-	lng: 35.483587,
-	description: 'The most stylish bar / restaurant of Beirut. Movie nights and good songs - the place to go in Beirut.',
-	external_link: 'https://www.beirut.com/l/72',
-	image:'deprague',
-	zomato_id: '18618953',
-},
-{
-	name: 'Starbucks coffee, Ashrafieh',
-	lat: 33.887618,
-	lng: 35.521087,
-	description: 'Another staple of Beirut for work. Only grievance - they have terrible internet.',
-	external_link: 'https://mena.starbucks.com/en',
-	image:'starbucks',
-	zomato_id: '18618953',
-},
-]
 
-//center of map on Beirut
-var centerofMap = {lat: 33.888630, lng: 35.495480}
+var Model = {
 
-var map;
+	//data for key places
+	keyPlaces: [
+	{
+		name: 'Aaliya cafe, Gemmayze',
+		lat: 33.8949747,
+		lng: 35.5184084,
+		description: 'Aaliyas cafe is perhaps one of the best cafes of Beirut. Quiet, full of lights and with a friendly staff, this is hands-on the place where I like to spend most of my working time in the city.',
+		external_link: 'https://www.facebook.com/AaliyasBooks/',
+		image:'aaliya',
+		zomato_id: '18618953',
+	},
+	{
+		name: 'Martyr Square, Gemmayze',
+		lat: 33.896391, 
+		lng: 35.507169,
+		description: 'Martyr Square is a place full of history in Beirut. Its name - Martyrs Square - comes in commemoration of the martyrs executed there under Ottoman rule. Moreover during the civil war it marked the demarcation line between East and West Beirut.',
+		external_link: 'https://en.wikipedia.org/wiki/Martyrs%27_Square,_Beirut',
+		image:'martyr_square',
+		zomato_id: '18618953',
+	},
+	{
+		name: 'Sip cafe, Gemmayze',
+		lat: 33.8951613,
+		lng: 35.5152216,
+		description: 'Lots of light, and delicious cafe. What else?',
+		external_link: 'http://travelingwiththyme.com/2018/02/sip-beirut-coffee-gemmayzeh/',
+		image:'sip',
+		zomato_id: '18618953',
+	},
+	{
+		name: 'Urbanista cafe, Gemmayze',
+		lat: 33.895041,
+		lng: 35.513431,
+		description: 'Good coffee, full of food options, and central in Beirut. It comes across as a bit touristy and is a bit expensive but its also a safe choice.',
+		external_link: 'http://www.weare-urbanista.com/about-us/',
+		image:'urbanista_gemmayze',
+		zomato_id: '18618953',
+	},
+	{
+		name: 'Urbanista cafe, Hamra',
+		lat: 33.899099,
+		lng: 35.483775,
+		description: 'Good coffee and full of food options.',
+		external_link: 'http://www.weare-urbanista.com/about-us/',
+		image:'urbanista_hamra',
+		zomato_id: '18618953',
+	},
+	{
+		name: 'De Prague Bar, Hamra',
+		lat: 33.896143,
+		lng: 35.483587,
+		description: 'The most stylish bar / restaurant of Beirut. Movie nights and good songs - the place to go in Beirut.',
+		external_link: 'https://www.beirut.com/l/72',
+		image:'deprague',
+		zomato_id: '18618953',
+	},
+	{
+		name: 'Starbucks coffee, Ashrafieh',
+		lat: 33.887618,
+		lng: 35.521087,
+		description: 'Another staple of Beirut for work. Only grievance - they have terrible internet.',
+		external_link: 'https://mena.starbucks.com/en',
+		image:'starbucks',
+		zomato_id: '18618953',
+	},
+	],
+//Location: center of Beirut
+	centerofMap: {lat: 33.888630, lng: 35.495480},
+}
+
+
+
+
+//GLobal variable to access all the markers
 var markersList = []
  
-var Zomato_user_key = "77335f51de6d653ec3fc9a14b78c256b";
+
 
 
 var essai;
@@ -107,7 +116,7 @@ var ViewModel = {
 		
 		PlacesList([]);
 
-		keyPlaces.forEach(function(place_data){
+		Model.keyPlaces.forEach(function(place_data){
 			self.PlacesList.push( new Place(place_data))
 		});
 	},
@@ -135,7 +144,7 @@ var ViewModel = {
 			"user-key": Zomato_user_key
 		})
 
-		let local_zomato_id = keyPlaces[index].zomato_id;
+		let local_zomato_id = Model.keyPlaces[index].zomato_id;
 	
 		fetch('https://developers.zomato.com/api/v2.1/restaurant?res_id=' + local_zomato_id, {headers: myHeaders})
   		.then(function(response) {
@@ -145,9 +154,9 @@ var ViewModel = {
   		  //console.log(myJson); // in case we should look at the JSON
   		  console.log(myJson.user_rating.aggregate_rating);
   		  console.log(local_zomato_id);
-  		  infowindow.open(map);      	
+  		  infowindow.open(View.map);      	
   		  $(`.rating.${local_zomato_id}`).html(myJson.user_rating.aggregate_rating);
-  		  infowindow.close(map);
+  		  infowindow.close(View.map);
   		  //View.updateinfowindow_withRating(Place_ID, myJson.user_rating.aggregate_rating);
   		  //View.infoWindowList[Place_ID] // ViewModel.ZomatoReview(myJson.user_rating.aggregate_rating);
  		 });
@@ -159,14 +168,15 @@ var ViewModel = {
 
 var View = {
 
+	map,
 	markersList:[],
 	infoWindowList:[],
 
-	//create a new map centered on Beirut
+	//create a new View.map centered on Beirut
 	newMap: function (){
-		map = new google.maps.Map(document.getElementById('map'), {
-		center: centerofMap,
-		zoom: 13
+		View.map = new google.maps.Map(document.getElementById('map'), { 
+			center: Model.centerofMap, 
+			zoom: 13
 		});
 	},
 
@@ -224,7 +234,7 @@ var mapMarker = function(value){
 
 	var marker = new google.maps.Marker({
 				position: mylatlong,
-				map:map,
+				map:View.map,
 				title: value.name()
 			});
 
@@ -245,7 +255,7 @@ var mapMarker = function(value){
           	infowindow_inlist.close();
           })
 
- 		  infoWindow.open(map, marker);      	
+ 		  infoWindow.open(View.map, marker);      	
         });
 
 
@@ -260,7 +270,7 @@ View.updateallinfowindow();
 
 //var essai = new mapMarker({lat, });
 
-//essai.setMap(map);
+//essai.setMap(View.map);
 
 ko.applyBindings(ViewModel);
 
@@ -321,7 +331,7 @@ ko.applyBindings(ViewModel);
 //}
 
 
-// Constructor creates a new map - only center and zoom are required.
+// Constructor creates a new View.map - only center and zoom are required.
 
 
 
