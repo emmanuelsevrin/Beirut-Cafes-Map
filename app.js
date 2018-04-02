@@ -74,19 +74,6 @@ var Model = {
 	centerofMap: {lat: 33.888630, lng: 35.495480},
 }
 
-
-
-
-//GLobal variable to access all the markers
-var markersList = []
- 
-
-
-
-var essai;
-
-//var PlacesList;
-
 var Place = function(place_data){
 	this.name = ko.observable(place_data.name);
 	this.lat = place_data.lat;
@@ -168,6 +155,7 @@ var ViewModel = {
 
 var View = {
 
+	//those three variables represent: 1) the map that will be displayed, 2) the list of markers, 3) the list of infowindows 
 	map,
 	markersList:[],
 	infoWindowList:[],
@@ -182,14 +170,14 @@ var View = {
 
 	addLocations: function(){
 		
-		markersList.forEach(function(marker){
+		View.markersList.forEach(function(marker){
 			marker.setMap(null);
 		});
 
-		markersList = [];
+		View. markersList = [];
 
 		PlacesList().forEach(function(value){
-			markersList.push(new mapMarker(value));
+			View.markersList.push(new mapMarker(value));
 		});
 	},
 
