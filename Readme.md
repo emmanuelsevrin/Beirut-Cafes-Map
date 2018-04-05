@@ -19,7 +19,7 @@ The application has a few additional documents beyond "web map" and "read me" - 
 THe Zomato ratings are pulled from the Zomato API, which has a limit of 1000 request per day. For this reason, the API request might not work if the volume of loads exceed this volume.   
 
 ## Sources and inspirations 
-The css and html code from this app took inspiration from an example single sidebar page available at this page
+The css and html code from this app took some inspiration from an example single sidebar page available at this page
 https://blackrockdigital.github.io/startbootstrap-simple-sidebar/#
 Which is available under MIT licence
 
