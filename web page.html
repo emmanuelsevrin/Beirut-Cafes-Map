@@ -9,7 +9,12 @@
 
     <title>All the cafes of Beirut</title>
 
-    <link href="bootstrap.min.css" rel="stylesheet">
+
+    <script type='text/javascript' src='knockout-3.4.2.js'></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <link href="styles.css" rel="stylesheet">
 
@@ -21,55 +26,51 @@
 
         <!-- Sidebar -->
         <div id="sidebar-wrapper">
+
             <ul class="sidebar-nav">
                 <li class="sidebar-brand">
-                    <a href="#">
-                        The cool cafes of Beirut
+
+             <button class="hamburger">&#9776;</button>
+                    <a>
+                        Cool cafes of Beirut
                     </a>
                 </li>
         <li> 
-            <form class='filter' data-bind="submit: ViewModel.sortPlaces"> Filter by keyword
-                <input id="filter" type="text" > </input>
+            <form id='filter_nav' data-bind="submit: ViewModel.sortPlaces">
+                <input id="filter" type="text" placeholder='Filter by keyworld' > </input>
             </form>
         </li>
-            <ul data-bind="foreach: View.placesList">
+            <ul id='list_places' data-bind="foreach: View.placesList">
                     <li class='places' data-bind="visible: visible, text: name, click: go_to_highlightmarker"></li>
             </ul>   
             </ul>
         </div>
 
         <!-- Page Content -->
+         <button id="hamburger_on_map" class="hamburger">&#9776;</button>
         <div id="map">
-        </div>
 
+        </div>
     </div>
 
 
-    <!-- /#wrapper -->
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="bootstrap.bundle.min.js"></script>
-
-    <!-- Menu Toggle Script -->
-    <script>
-    $("#menu-toggle").click(function(e) {
-        e.preventDefault();
-        $("#wrapper").toggleClass("toggled");
-    });
-    </script>
-
-
-    <script type='text/javascript' src='knockout-3.4.2.js'></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
     <script src="app.js"></script>
+
     <script>
-      //separate function to call ViewModel.initMap() 
+      //separate function to call ViewModel.initMap() and Google Error, inserted here since they don't always work when put in the app file
       function loadapp(){
         ViewModel.initMap();}
+
+      function handleGoogleError(){
+            alert('Error message: There was an issue with the loading of Google Maps. ');
+            console.log('error with google');
+        }
     </script>
-    <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7-2mPi_PI5byQPXVAD-qBn9Y-SQDjs7Q&v=3&callback=loadapp">
+
+    <script async defer 
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7-2mPi_PI5byQPXVAD-qBn9Y-SQDjs7Q&v=3&callback=loadapp" 
+        onerror='handleGoogleError()'
+        >
     </script>
 
 </body>

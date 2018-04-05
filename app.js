@@ -74,6 +74,8 @@ var ViewModel = {
 		//fetches all the locations from the model
 		this.getallPlaces();
 		ko.applyBindings(ViewModel);
+		View.setHamburgertoggle();
+		View.hideselectionbar();
 	},
 
 
@@ -85,6 +87,7 @@ var ViewModel = {
 
 		//updates all infowindow with the Zomato Rating. Loads only when the google maps is on since the Infowindow are loaded then. That could be changed if connectivity was a big problem
 		ViewModel.updateallinfowindow();
+
 	},
 
 	//constructor for places from the Model
@@ -175,6 +178,10 @@ var ViewModel = {
 			alert('Error message: There was an issue with the loading of the Zomato Review. However, you should still be able to use the rest of the app ' + e);
 		};
 		ViewModel.ZomatoError = true;
+	},
+
+	handleGoogleError: function(){
+		alert('Error message: There was an issue with the loading of Google Maps. ')
 	}
 }
 
@@ -189,6 +196,11 @@ var View = {
 	newMap: function (){
 		View.map = new google.maps.Map(document.getElementById('map'), { 
 			center: Model.centerofMap, 
+			mapTypeControl: true,
+			mapTypeControlOptions: {
+              	style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+              	position: google.maps.ControlPosition.TOP_CENTER
+          },
 		});
 		View.updatemapsize();
 	},
@@ -251,10 +263,10 @@ var View = {
 			  marker.highlightmarker();
 	    });
 
-
 		return marker
 	},
 
+	//update the level of zoom in the map when the size of the screen changes (to avoid the map being too far away on small screens) 
 	updatemapsize: function(){
 		View.map.setCenter(Model.centerofMap);
 		if(screen.width < 500){
@@ -270,7 +282,7 @@ var View = {
 		html_string ='<div class="row">' +
 		'<div flex=30% class="column"><img width="100" height="100" src="images/' + image + '.jpg">'+ '</div>' +
 		'<div flex=60% class="column">' + 
-		'<h1>' + title + '</h1>' + 
+		'<h4>' + title + '</h4>' + 
 		'<div id="bodyContent">' + 
 		content + 
 		'</div>' + 
@@ -281,6 +293,25 @@ var View = {
  		
 		return html_string
 	},
+
+	//set the function of the hamburger to let the menu toggle
+	setHamburgertoggle: function(){
+		$(".hamburger").click(function(e) {
+        	e.preventDefault();
+        	$("#wrapper").toggleClass("toggled");
+     	   ViewModel.initMap(); 
+   		 });
+
+	},
+
+	//automatically hide the selection bar when the size of the screen is too small
+	hideselectionbar: function(){
+		if(screen.width < 500){
+			$("#wrapper").toggleClass("toggled");
+     	   ViewModel.initMap(); 
+		}
+	}
+
 
 }
 
