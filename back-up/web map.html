@@ -4,20 +4,21 @@
 
     <link rel="stylesheet" href="styles.css">
 
-
+    <!-- Bootstrap -->
+    <link href="bootstrap.min.css" rel="stylesheet">
 
   </head>
   <body>
 
-    <div class="container">
-
-      <div class="options-box">
-        <h1 >All the cool spots of Beirut </h1>
+    <div class="container" id="wrapper">
+      <div id="sidebar-wrapper">
+        <ul id="sidebar-nav">
+          <li class="title">All the cool spots of Beirut </li>
         
-        <form class='filter' data-bind="submit: ViewModel.sortPlaces"> Filter by keyword
-          <input id="filter" type="text" > </input>
-        </form>
-        <ul data-bind="foreach: View.placesList">
+          <form class='filter' data-bind="submit: ViewModel.sortPlaces"> Filter by keyword
+            <input id="filter" type="text" > </input>
+          </form>
+        <ul id="list_places" data-bind="foreach: View.placesList">
           <li class='places' data-bind="visible: visible, text: name, click: go_to_highlightmarker"></li>
         </ul>
       </div>
@@ -36,11 +37,6 @@
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7-2mPi_PI5byQPXVAD-qBn9Y-SQDjs7Q&v=3&callback=loadapp">
     </script>
-
-
-
-
-
 
 
   </body>

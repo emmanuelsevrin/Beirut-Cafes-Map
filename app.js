@@ -189,8 +189,8 @@ var View = {
 	newMap: function (){
 		View.map = new google.maps.Map(document.getElementById('map'), { 
 			center: Model.centerofMap, 
-			zoom: 13
 		});
+		View.updatemapsize();
 	},
 
 	//create new markers and add them tothe Markerlist 
@@ -255,6 +255,16 @@ var View = {
 		return marker
 	},
 
+	updatemapsize: function(){
+		View.map.setCenter(Model.centerofMap);
+		if(screen.width < 500){
+			View.map.setZoom(14);
+		}
+		else{
+			View.map.setZoom(13);	
+		}
+	},
+
 	//creates a text description that can be inserted in the infowwindow
 	Createdescription: function(title, content, external_link, image, zomato_id){
 		html_string ='<div class="row">' +
@@ -275,4 +285,6 @@ var View = {
 }
 
 ViewModel.init();
+
+console.log(screen.width);
 
