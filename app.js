@@ -61,10 +61,12 @@ var Model = {
 		zomato_id: '16503534',
 	},
 	],
-//Location: center of Beirut
+	//Location: center of Beirut
 	centerofMap: {lat: 33.888630, lng: 35.495480},
-}
 
+	//a table that will be filled with the zomato rating for each item
+	ZomatoRatings: []
+};
 
 var ViewModel = {
 
@@ -74,20 +76,20 @@ var ViewModel = {
 		//fetches all the locations from the model
 		this.getallPlaces();
 		ko.applyBindings(ViewModel);
-		View.setHamburgertoggle();
-		View.hideselectionbar();
-	},
+		ViewModel.hideselectionbar();
+		ViewModel.initializeZomatoRatings();
 
+		//updates all infowindow with the Zomato Rating. 
+		Model.keyPlaces.forEach(function(place, index){
+			ViewModel.updateZomatoReview(place.zomato_id);
+		});
+	},
 
 	initMap: function(){
 
 		//creates a new map and add all the locations
 		View.newMap();
 		View.addMarkers();
-
-		//updates all infowindow with the Zomato Rating. Loads only when the google maps is on since the Infowindow are loaded then. That could be changed if connectivity was a big problem
-		ViewModel.updateallinfowindow();
-
 	},
 
 	//constructor for places from the Model
@@ -106,21 +108,20 @@ var ViewModel = {
 
 	//fetches all the locations from the model
 	getallPlaces: function(){
-		
 		Model.keyPlaces.forEach(function(place_data, index){
 			View.placesList.push(new ViewModel.Place(place_data, index));
 		});
 	},
 
+	//the value entered in the filter field in the page
+	filterString: ko.observable(""),
+
 	//sorts PlacesList according to the keyword entered by the user
 	sortPlaces: function(entry){
 		
-		//the value entered by the user in the filter field
-		var filterString = $("#filter").val();
-
 		//going through each item and removing them if they don't match the string
 		for(k=0; k<View.placesList.length; k++) {
-			if(!View.placesList[k].name().includes(filterString)){
+			if(!View.placesList[k].name().includes(ViewModel.filterString())){
 				View.placesList[k].visible(false);
 			}
 			else{
@@ -131,66 +132,76 @@ var ViewModel = {
 	View.updateMap();	
 	},
 
+	//initialize the list of Zomato rating with "N/A"
+	initializeZomatoRatings: function(){
+		Model.keyPlaces.forEach(function(place,index){
+			let local_zomato_id = place.zomato_id.toString();
+			Model.ZomatoRatings[local_zomato_id] = "N/A";
+		});
+	},
+
 	//update a target infowindow with their zomato review
-	updateInfowindowWithZomatoReview: function(infowindow, index){
+	updateZomatoReview: function(zomato_id){
 		var myHeaders = new Headers({
 			"user-key": Zomato_user_key
-		})
+		});
 
-		var local_zomato_id = Model.keyPlaces[index].zomato_id;
+//		var local_zomato_id = Model.keyPlaces[index].zomato_id;
 	
-		fetch('https://developers.zomato.com/api/v2.1/restaurant?res_id=' + local_zomato_id, {headers: myHeaders})
+		fetch('https://developers.zomato.com/api/v2.1/restaurant?res_id=' + zomato_id, {headers: myHeaders})
   		.then(function(response) {
   			 	return response.json();
   			})	 	
   		.then(function(myJson){
   			 	var new_rating = myJson.user_rating.aggregate_rating;
-  				//if closed, opens up the infowindow then uses jQuery to update it
-  				var infowindowwasopen = false;
-
-			  		if(infowindow.getMap()){
-	  				  	 infowindowwasopen = true;      		
-	  				}
-  				
-  				infowindow.open(View.map);
-
-  				$(`.rating.${local_zomato_id}`).html(new_rating);
-  		  
-			  		if(!infowindowwasopen){
-	  		  				infowindow.close();
-	  				}
+	  			Model.ZomatoRatings[zomato_id] = new_rating;
  		})
   		.catch(e => ViewModel.handleZomatoError(e));
 
 	},
 
-	//go through each infowindow and update it with the zomato review
-	updateallinfowindow: function(){
-		View.infoWindowList.forEach(function(infowindow, index){
-			ViewModel.updateInfowindowWithZomatoReview(infowindow, index);
-		});
-	},
-
+	//a marker that indicates whether there has already been a zomato error happening (avoids the pop-up window to show up 6 times in case of an arror)
 	ZomatoError: false,
 
+	//sends a pop-up message if there is an error with the zomato API
 	handleZomatoError: function(e){
 		if(!ViewModel.ZomatoError){
 			alert('Error message: There was an issue with the loading of the Zomato Review. However, you should still be able to use the rest of the app ' + e);
-		};
+		}
+    
 		ViewModel.ZomatoError = true;
 	},
 
+	//sends a pop-up message if there is an error with the Google API
 	handleGoogleError: function(){
-		alert('Error message: There was an issue with the loading of Google Maps. ')
+		alert('Error message: There was an issue with the loading of Google Maps. ');
+	},
+
+	getZomatoRating(zomato_id){
+		return Model.ZomatoRatings[zomato_id];
+	},
+
+	//set the function of the hamburger to let the menu toggle
+	ToggleList: function(){
+		toggled = (!ViewModel.toggled);
+		$("#wrapper").toggleClass("toggled");//using jquery to modify the CSS, not sure whether it's doable with knockout
+		google.maps.event.trigger(map, 'resize');
+	},
+
+	//automatically hide the selection bar when the size of the screen is too small
+	hideselectionbar: function(){
+		if(screen.width < 500){
+			$("#wrapper").class("");
+		}
 	}
-}
+};
 
 var View = {
-	//those three variables represent: 1) the map that will be displayed, 2) the list of markers, 3) the list of infowindows 
+	//those  variables represent: 1) the map that will be displayed, 2) the list of places, 3) the list of markers, 4) the infowindow 
 	map,
-	placesList: [],
+	placesList:[],
 	markersList:[],
-	infoWindowList:[],
+	infoWindow: [],
 
 	//create a new View.map centered on Beirut
 	newMap: function (){
@@ -202,8 +213,17 @@ var View = {
               	position: google.maps.ControlPosition.TOP_CENTER
           },
 		});
+
+		//new infowindow
+		View.infoWindow = new google.maps.InfoWindow({
+	        content: "",
+	        maxWidth: 450
+	    });
+
 		View.updatemapsize();
 	},
+
+//View.Createdescription(value.name(), value.description, value.external_link, value.image, value.zomato_id)
 
 	//create new markers and add them tothe Markerlist 
 	addMarkers: function(){
@@ -216,20 +236,20 @@ var View = {
 	//update map to only keep the markers and infowindows for items open
 	updateMap: function(){
 		View.placesList.forEach(function(place, index){
+			View.infoWindow.close();
 			if(!place.visible()){
 				View.markersList[index].setMap(null);
-				View.infoWindowList[index].close();
 			}
 			else{
 				View.markersList[index].setMap(View.map);
 			}
-		})
+		});
 	},
 
 	//constructor for a new map marker
 	mapMarker: function(value){
 
-		var mylatlong = {lat: value.lat, lng: value.lng}
+		var mylatlong = {lat: value.lat, lng: value.lng};
 
 		var marker = new google.maps.Marker({
 					position: mylatlong,
@@ -237,33 +257,20 @@ var View = {
 					title: value.name()
 				});
 
-		//creating the infowindow by pulling the infowindow text from the function below
-		var infoWindow = new google.maps.InfoWindow({
-	        content: View.Createdescription(value.name(), value.description, value.external_link, value.image, value.zomato_id),
-	        maxWidth: 400
-	    });
-
-		//adding to the list of infowindows
-	    View.infoWindowList.push(infoWindow);
-
 	    //function that highlight the marker and opens the infowindow. Is activated either by clicking on the marker or on the list item
 	    marker.highlightmarker =  function(){
 	    	  marker.setAnimation(google.maps.Animation.BOUNCE);
 	          setTimeout(function(){marker.setAnimation(null); }, 1400);
-
-	          //go through each infowindow and close it before opening a new one 
-	          View.infoWindowList.forEach(function(infowindow_inlist){
-	          	infowindow_inlist.close();
-	          })
-
-	 		  infoWindow.open(View.map, marker);
-	 	}
+	          let local_html = View.Createdescription(value.name(), value.description, value.external_link, value.image, value.zomato_id);
+			  View.infoWindow.setContent(local_html);
+	 		  View.infoWindow.open(View.map, marker);
+	 	};
 
 		marker.addListener('click', function() {
 			  marker.highlightmarker();
 	    });
 
-		return marker
+		return marker;
 	},
 
 	//update the level of zoom in the map when the size of the screen changes (to avoid the map being too far away on small screens) 
@@ -287,35 +294,15 @@ var View = {
 		content + 
 		'</div>' + 
 		'<p> <a href="'+ external_link + '">'+ external_link + '</a></p>' + 
- 		`<p> Zomato Rating: <span class="rating ${zomato_id}">N/A</span></p>` + //the N/A will be updated if/ once we have loaded the zomato review 
+ 		`<p> Zomato Rating: <span class="rating"> ${ViewModel.getZomatoRating(zomato_id)}</span></p>` + //the N/A will be updated if/ once we have loaded the zomato review 
  		'</div>' + 
- 		'</div>'
+ 		'</div>';
  		
-		return html_string
+		return html_string;
 	},
 
-	//set the function of the hamburger to let the menu toggle
-	setHamburgertoggle: function(){
-		$(".hamburger").click(function(e) {
-        	e.preventDefault();
-        	$("#wrapper").toggleClass("toggled");
-     	   ViewModel.initMap(); 
-   		 });
-
-	},
-
-	//automatically hide the selection bar when the size of the screen is too small
-	hideselectionbar: function(){
-		if(screen.width < 500){
-			$("#wrapper").toggleClass("toggled");
-     	   ViewModel.initMap(); 
-		}
-	}
-
-
-}
+};
 
 ViewModel.init();
 
-console.log(screen.width);
 
