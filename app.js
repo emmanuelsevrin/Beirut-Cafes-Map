@@ -191,7 +191,7 @@ var ViewModel = {
 	//automatically hide the selection bar when the size of the screen is too small
 	hideselectionbar: function(){
 		if(screen.width < 500){
-			$("#wrapper").class("");
+			$("#wrapper").removeClass("toggled");
 		}
 	}
 };
